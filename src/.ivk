@@ -1,0 +1,1 @@
+--forgefiles=Forgefile.hsl --Forgefile-projects=lib-pdf-sty-parser --includes=. --bin-output-dir=../lib --obj-output-dir=o/
