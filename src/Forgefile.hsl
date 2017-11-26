@@ -59,7 +59,7 @@ lib-pdf-sty-parser.epilogue() {
         var forge_exit_code type int;
         $forge_exit_code = hefesto.sys.forge("lib-pdf-sty-parser-tests",
                                              "Forgefile.hsl", "--includes=../ --libraries=../../lib " +
-                                                              "--ldflags=-lscieloxmlparser " +
+                                                              "--ldflags=-lpdfstyparser " +
                                                               "--bin-output-dir=bin --obj-output-dir=o " +
                                                               $add_cmd);
 

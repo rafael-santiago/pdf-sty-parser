@@ -1,0 +1,107 @@
+#
+#                                                 Copyright (C) 2017
+#
+# This is free software. You can redistribute it and/or modify under
+# the terms of the GNU General Public License version 2.
+#
+#
+
+include ../Toolsets.hsl
+include ~/fsutil.hsl
+
+local var src type list;
+local var inc type list;
+local var cflags type list;
+local var lib type list;
+local var ldflags type list;
+local var appname type string;
+local var current_toolset type string;
+
+project lib-pdf-sty-parser-tests : toolset $current_toolset : $src, $inc, $cflags, $lib, $ldflags, $appname;
+
+lib-pdf-sty-parser-tests.preloading() {
+    $current_toolset = get_app_toolset();
+}
+
+lib-pdf-sty-parser-tests.prologue() {
+    mkcutest();
+
+    $src.ls(".*\\.c$");
+
+    $inc = hefesto.sys.get_option("includes");
+    $cflags = hefesto.sys.get_option("cflags");
+    $lib = hefesto.sys.get_option("libraries");
+    $ldflags = hefesto.sys.get_option("ldflags");
+    $appname = "lib-pdf-sty-parser-tests";
+
+    if (hefesto.sys.os_name() == "windows") {
+        $appname = $appname + ".exe";
+    }
+
+    $inc.add_item("cutest/src");
+
+    $lib.add_item("cutest/src/lib");
+    $ldflags.add_item("-lcutest");
+
+    if (hefesto.sys.os_name() == "linux") {
+        $ldflags.add_item("-ldl");
+        $ldflags.add_item("-lpthread");
+    } else if (hefesto.sys.os_name() == "freebsd") {
+        $ldflags.add_item("-lexecinfo");
+        $ldflags.add_item("-lpthread");
+    } else if (hefesto.sys.os_name() == "netbsd") {
+        $ldflags.add_item("-lexecinfo");
+        $ldflags.add_item("-lpthread");
+    } else if (hefesto.sys.os_name() == "openbsd") {
+        $ldflags.add_item("-lexecinfo");
+        $ldflags.add_item("-lpthread");
+    } else if (hefesto.sys.os_name() == "minix") {
+        $ldflags.add_item("-lexecinfo");
+    } else if (hefesto.sys.os_name() == "solaris") {
+        $cflags.add_item("-DNO_CUTEST_BACKTRACING");
+        $ldflags.add_item("-lpthread");
+    }
+
+    if (hefesto.sys.os_name() != "windows") {
+        if (isdir("/usr/local/include")) {
+            $inc.add_item("/usr/local/include");
+        }
+
+        if (isdir("/usr/local/lib")) {
+            $lib.add_item("/usr/local/lib");
+        }
+    }
+}
+
+lib-pdf-sty-parser-tests.epilogue() {
+    if (hefesto.sys.last_forge_result() == 0) {
+        var test_exec_cmd type string;
+        $test_exec_cmd = hefesto.sys.make_path("bin", $appname);
+
+        var exit_code type int;
+        $exit_code = hefesto.sys.run($test_exec_cmd + " --cutest-leak-check=yes");
+
+        if ($exit_code != 0) {
+            hefesto.project.abort($exit_code);
+        }
+    }
+}
+
+local function mkcutest() : result type none {
+    var oldcwd type string;
+
+    $oldcwd = hefesto.sys.pwd();
+
+    if (hefesto.sys.cd("cutest/src")) {
+        hefesto.sys.forge("cutest", "Forgefile.hsl", "--obj-output-dir=obj --bin-output-dir=lib");
+    } else {
+        hefesto.sys.echo("BUILD ERROR: Unable to find the libcutest sub-directory.\n");
+        hefesto.project.abort(1);
+    }
+
+    hefesto.sys.cd($oldcwd);
+
+    if (hefesto.sys.last_forge_result() != 0) {
+        hefesto.project.abort(1);
+    }
+}

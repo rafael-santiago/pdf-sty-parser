@@ -20,6 +20,8 @@ char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
 
     bp = *buf;
 
+    (*data_size) = 0;
+
     while (bp != buf_end && strstr(bp, "</") != bp) {
         bp++;
         (*data_size) += 1;
@@ -40,8 +42,14 @@ char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
 }
 
 char *pdf_sty_case_folding(char *data, const size_t data_size) {
-    char *dp = data;
-    char *dp_end = dp + data_size;
+    char *dp, *dp_end;
+
+    if (data == NULL) {
+        return NULL;
+    }
+
+    dp = data;
+    dp_end = dp + data_size;
 
     while (dp != dp_end) {
         if (isalpha(*dp)) {
