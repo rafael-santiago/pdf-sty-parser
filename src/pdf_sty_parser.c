@@ -63,7 +63,7 @@ pdf_sty_word_ctx *pdf_sty_parse_pdf(const char *filepath) {
 
     // INFO(Rafael): Reducing the search space for each page.
 
-    pages = (struct pages_ctx *) pdf_sty_newseg(sizeof(struct pages_ctx *) * pages_nr);
+    pages = (struct pages_ctx *) pdf_sty_newseg(sizeof(struct pages_ctx) * pages_nr);
 
     for (curr_page = 0; curr_page < pages_nr; curr_page++) {
         pages[curr_page].words = NULL;
@@ -80,6 +80,7 @@ pdf_sty_word_ctx *pdf_sty_parse_pdf(const char *filepath) {
                 pages[curr_page - 1].words = add_word_to_pdf_sty_word(pages[curr_page - 1].words,
                                                                       data, data_size, curr_page,
                                                                       &pages[curr_page - 1].words_tail);
+                pdf_sty_freeseg(data);
             }
         }
 

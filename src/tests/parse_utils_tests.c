@@ -51,7 +51,8 @@ CUTE_TEST_CASE(pdf_sty_get_data_from_tag_tests)
     struct get_data_from_tag_tests test_vector[] = {
         { "Bold</b>", "BOLD", 4 },
         { "iTaLiC</i>", "ITALIC", 6 },
-        { "WowCreative</i>", "WOWCREATIVE", 11 }
+        { "WowCreative</i>", "WOWCREATIVE", 11 },
+        { "ParanGaricutirimirruaru!!!!</b>", "PARANGARICUTIRIMIRRUARU", 23 }
     };
 
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;

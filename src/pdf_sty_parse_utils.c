@@ -10,6 +10,10 @@
 #include <ctype.h>
 #include <string.h>
 
+#define pdf_sty_parse_is_punctuation(b) ( (b) == ',' || (b) == '.' || (b) == ';' || (b) == '(' || (b) == ')' ||\
+                                          (b) == '?' || (b) == '!' || (b) == ':' || (b) == '[' || (b) == ']' ||\
+                                          (b) == '{' || (b) == '}')
+
 char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
     char *bp;
     char *data;
@@ -22,9 +26,15 @@ char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
 
     (*data_size) = 0;
 
-    while (bp != buf_end && strstr(bp, "</") != bp) {
+    while (bp != buf_end && strstr(bp, "</") != bp && !pdf_sty_parse_is_punctuation(*bp)) {
         bp++;
         (*data_size) += 1;
+    }
+
+    if (pdf_sty_parse_is_punctuation(*bp)) {
+        while (bp != buf_end && strstr(bp, "</") != bp) {
+            bp++;
+        }
     }
 
     if (bp == buf_end) {
@@ -36,7 +46,7 @@ char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
     memset(data, 0, (*data_size) + 1);
     memcpy(data, *buf, *data_size);
     data = pdf_sty_case_folding(data, *data_size);
-    (*buf) += *data_size;
+    (*buf) = bp;
 
     return data;
 }
@@ -146,3 +156,5 @@ char *pdf_sty_case_folding(char *data, const size_t data_size) {
 
     return data;
 }
+
+#undef pdf_sty_parse_is_punctuation
