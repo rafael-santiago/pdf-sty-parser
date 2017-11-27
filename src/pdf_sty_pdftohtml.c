@@ -7,6 +7,7 @@
  */
 #include <pdf_sty_pdftohtml.h>
 #include <pdf_sty_memory.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
