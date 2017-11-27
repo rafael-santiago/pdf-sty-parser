@@ -15,7 +15,7 @@
 #define PDF_STY_PDFTOHTML_SFILE_SFFX "s.html"
 
 char *pdf_sty_pdftohtml(const char *filepath, size_t *data_size) {
-    char *data = NULL;
+    char *data = NULL, *dp, *dp_end;
     char *temp_filepath = NULL;
     char sfilepath[0xffff], cmdline[0xffff];
     FILE *fp = NULL;
@@ -49,6 +49,15 @@ char *pdf_sty_pdftohtml(const char *filepath, size_t *data_size) {
     data = (char *) pdf_sty_newseg(*data_size + 1);
     memset(data, 0L, *data_size + 1);
     fread(data, 1, *data_size, fp);
+
+    dp = data;
+    dp_end = dp + *data_size;
+
+    // INFO(Rafael): Some versions of pdftohtml has some case differences in HTML tags.
+    while (dp != dp_end) {
+        *dp = tolower(*dp);
+        dp++;
+    }
 
     fclose(fp);
 
