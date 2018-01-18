@@ -41,7 +41,7 @@ pdf_sty_word_ctx *pdf_sty_parse_pdf(const char *filepath) {
     int has_error = 0;
     char *data = NULL;
     size_t data_size;
-    int curr_page, pages_nr = 0;
+    int curr_page, pages_nr = 0, pn;
 
     buf = pdf_sty_pdftohtml(filepath, &buf_size);
 
@@ -89,12 +89,28 @@ pdf_sty_word_ctx *pdf_sty_parse_pdf(const char *filepath) {
     }
 
     // INFO(Rafael): Merging all document pages.
+    words = NULL;
 
-    words = pages[0].words;
-
-    for (curr_page = 1; curr_page < pages_nr; curr_page++) {
-        pages[curr_page - 1].words_tail->next = pages[curr_page].words;
+    pn = 0;
+    while (pages[pn].words == NULL && pn < pages_nr) {
+        pn++;
     }
+
+    if (pn == pages_nr) {
+        goto pdf_sty_parse_pdf_epilogue;
+    }
+
+
+    words = pages[pn].words;
+
+    for (curr_page = pn + 1; curr_page < pages_nr; curr_page++) {
+        if (pages[curr_page].words != NULL) {
+            pages[pn].words_tail->next = pages[curr_page].words;
+            pn = curr_page;
+        }
+    }
+
+pdf_sty_parse_pdf_epilogue:
 
     pdf_sty_freeseg(pages);
     pdf_sty_freeseg(buf);

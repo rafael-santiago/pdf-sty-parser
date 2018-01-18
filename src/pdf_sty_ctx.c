@@ -27,6 +27,7 @@ pdf_sty_word_ctx *add_word_to_pdf_sty_word(pdf_sty_word_ctx *words,
                                            const int page, pdf_sty_word_ctx **tail) {
 
     pdf_sty_word_ctx *h = words, *p = NULL;
+    int brand_new = 0;
 
     if (data == NULL || data_size == 0) {
         return words;
@@ -35,6 +36,7 @@ pdf_sty_word_ctx *add_word_to_pdf_sty_word(pdf_sty_word_ctx *words,
     if (words == NULL) {
         new_pdf_sty_word_ctx(p);
         h = p;
+        brand_new = 1;
     } else if ((p = get_pdf_sty_word_data(data, words)) == NULL) {
         if (tail != NULL) {
             p = (*tail);
@@ -47,6 +49,8 @@ pdf_sty_word_ctx *add_word_to_pdf_sty_word(pdf_sty_word_ctx *words,
         new_pdf_sty_word_ctx(p->next);
 
         p = p->next;
+
+        brand_new = 1;
     }
 
     if (p->data == NULL) {
@@ -59,7 +63,7 @@ pdf_sty_word_ctx *add_word_to_pdf_sty_word(pdf_sty_word_ctx *words,
 
     p->freq++;
 
-    if (tail != NULL) {
+    if (tail != NULL && brand_new) {
         (*tail) = p;
     }
 
