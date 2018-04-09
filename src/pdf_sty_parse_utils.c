@@ -9,10 +9,13 @@
 #include <pdf_sty_memory.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdio.h>
 
 #define pdf_sty_parse_is_punctuation(b) ( (b) == ',' || (b) == '.' || (b) == ';' || (b) == '(' || (b) == ')' ||\
                                           (b) == '?' || (b) == '!' || (b) == ':' || (b) == '[' || (b) == ']' ||\
                                           (b) == '{' || (b) == '}')
+
+static void pdf_sty_rm_hyphenation(char *buf, size_t *data_size);
 
 char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
     char *bp;
@@ -46,6 +49,7 @@ char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
     memset(data, 0, (*data_size) + 1);
     memcpy(data, *buf, *data_size);
     data = pdf_sty_case_folding(data, *data_size);
+    pdf_sty_rm_hyphenation(data, data_size);
     (*buf) = bp;
 
     return data;
@@ -63,87 +67,87 @@ char *pdf_sty_case_folding(char *data, const size_t data_size) {
 
     while (dp != dp_end) {
         if (isalpha(*dp)) {
-            *dp = toupper(*dp);
+            *dp = tolower(*dp);
         } else {
-            switch (*dp) {
+            switch (tolower(*dp)) {
                 case 'á':
-                    *dp = 'Á';
+                    *dp = 'á';
                     break;
 
                 case 'â':
-                    *dp = 'Â';
+                    *dp = 'â';
                     break;
 
                 case 'ã':
-                    *dp = 'Ã';
+                    *dp = 'ã';
                     break;
 
                 case 'à':
-                    *dp = 'À';
+                    *dp = 'à';
                     break;
 
                 case 'ä':
-                    *dp = 'Ä';
+                    *dp = 'ä';
                     break;
 
                 case 'é':
-                    *dp = 'É';
+                    *dp = 'é';
                     break;
 
                 case 'ê':
-                    *dp = 'Ê';
+                    *dp = 'ê';
                     break;
 
                 case 'è':
-                    *dp = 'È';
+                    *dp = 'è';
                     break;
 
                 case 'ë':
-                    *dp = 'Ë';
+                    *dp = 'ë';
                     break;
 
                 case 'í':
-                    *dp = 'Í';
+                    *dp = 'í';
                     break;
 
                 case 'ï':
-                    *dp = 'Ï';
+                    *dp = 'ï';
                     break;
 
                 case 'ì':
-                    *dp = 'Ì';
+                    *dp = 'ì';
                     break;
 
                 case 'ó':
-                    *dp = 'Ó';
+                    *dp = 'ó';
                     break;
 
                 case 'ö':
-                    *dp = 'Ö';
+                    *dp = 'ö';
                     break;
 
                 case 'ò':
-                    *dp = 'Ò';
+                    *dp = 'ò';
                     break;
 
                 case 'õ':
-                    *dp = 'Õ';
+                    *dp = 'õ';
                     break;
 
                 case 'ú':
-                    *dp = 'Ú';
+                    *dp = 'ú';
                     break;
 
                 case 'ü':
-                    *dp = 'Ü';
+                    *dp = 'ü';
                     break;
 
                 case 'ù':
-                    *dp = 'Ù';
+                    *dp = 'ù';
                     break;
 
-                case 'ç':
-                    *dp = 'Ç';
+                case 0xC7:
+                    *dp = 'ç';
                     break;
 
                 default:
@@ -155,6 +159,33 @@ char *pdf_sty_case_folding(char *data, const size_t data_size) {
     }
 
     return data;
+}
+
+static void pdf_sty_rm_hyphenation(char *buf, size_t *data_size) {
+    char temp_buf[0xFFFF], *bp, *bp_end;
+    size_t temp_buf_size;
+
+    if (buf == NULL || data_size == NULL || *data_size == 0 || *data_size > sizeof(temp_buf)) {
+        return;
+    }
+
+    if (strstr(buf, "-<br>") != NULL) {
+        memset(temp_buf, 0, sizeof(temp_buf));
+        temp_buf_size = 0;
+        bp = buf;
+        bp_end = bp + *data_size;
+
+        while (bp < bp_end) {
+            if (strstr(bp, "-<br>") == bp) {
+                bp += 4;
+            } else {
+                temp_buf[temp_buf_size++] = *bp;
+            }
+            bp++;
+        }
+        *data_size = temp_buf_size;
+        sprintf(buf, "%s", temp_buf);
+    }
 }
 
 #undef pdf_sty_parse_is_punctuation

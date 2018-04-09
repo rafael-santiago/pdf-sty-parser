@@ -21,19 +21,19 @@ CUTE_TEST_CASE(pdf_sty_parse_pdf_tests)
     wp = words;
 
     CUTE_ASSERT(wp->page == 1);
-    CUTE_ASSERT(strcmp(wp->data, "FOOBAR") == 0);
+    CUTE_ASSERT(strcmp(wp->data, "foobar") == 0);
     CUTE_ASSERT(wp->freq == 2);
 
     wp = wp->next;
 
     CUTE_ASSERT(wp->page == 2);
-    CUTE_ASSERT(strcmp(wp->data, "FOOBAR") == 0);
+    CUTE_ASSERT(strcmp(wp->data, "foobar") == 0);
     CUTE_ASSERT(wp->freq == 1);
 
     wp = wp->next;
 
     CUTE_ASSERT(wp->page == 3);
-    CUTE_ASSERT(strcmp(wp->data, "WORKS") == 0);
+    CUTE_ASSERT(strcmp(wp->data, "works") == 0);
     CUTE_ASSERT(wp->freq == 1);
 
     wp = wp->next;

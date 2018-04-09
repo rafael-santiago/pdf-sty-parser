@@ -18,10 +18,10 @@ CUTE_TEST_CASE(pdf_sty_case_folding_tests)
     };
 
     struct case_folding_tests test_vector[] = {
-        { "foo", "FOO" },
-        { "fOobaR", "FOOBAR" },
-        { "após", "APÓS" },
-        { "pêssego", "PÊSSEGO" }
+        { "foo", "foo" },
+        { "fOobaR", "foobar" },
+        { "após", "após" },
+        { "pêssego", "pêssego" }
     };
 
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
@@ -49,10 +49,12 @@ CUTE_TEST_CASE(pdf_sty_get_data_from_tag_tests)
     };
 
     struct get_data_from_tag_tests test_vector[] = {
-        { "Bold</b>", "BOLD", 4 },
-        { "iTaLiC</i>", "ITALIC", 6 },
-        { "WowCreative</i>", "WOWCREATIVE", 11 },
-        { "ParanGaricutirimirruaru!!!!</b>", "PARANGARICUTIRIMIRRUARU", 23 }
+        { "Bold</b>", "bold", 4 },
+        { "iTaLiC</i>", "italic", 6 },
+        { "WowCreative</i>", "wowcreative", 11 },
+        { "ParanGaricutirimirruaru!!!!</b>", "parangaricutirimirruaru", 23 },
+        { "Abstração refle-<bR>tida</b>", "abstração refletida", 19 },
+        { "O nasci-<BR>MentO DA inteligência na CRIanÇA</i>", "o nascimento da inteligência na criança", 39 }
     };
 
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;
