@@ -54,7 +54,11 @@ CUTE_TEST_CASE(pdf_sty_get_data_from_tag_tests)
         { "WowCreative</i>", "wowcreative", 11 },
         { "ParanGaricutirimirruaru!!!!</b>", "parangaricutirimirruaru", 23 },
         { "Abstração refle-<bR>tida</b>", "abstração refletida", 19 },
-        { "O nasci-<BR>MentO DA inteligência na CRIanÇA</i>", "o nascimento da inteligência na criança", 39 }
+        { "O nasci-<BR>MentO DA inteligência na CRIanÇA</i>", "o nascimento da inteligência na criança", 39 },
+        { "quali-<br/>tative</i>", "qualitative", 11 },
+        { "quali-<br/>tative&#160</b>", "qualitative", 11 },
+        { "research&#160</i>", "research", 8 },
+        { "research&nbsp;</b>", "research", 8 }
     };
 
     size_t test_vector_nr = sizeof(test_vector) / sizeof(test_vector[0]), t;

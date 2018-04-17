@@ -32,6 +32,11 @@ char *pdf_sty_get_data_from_tag(char **buf, char *buf_end, size_t *data_size) {
     while (bp != buf_end && strstr(bp, "</") != bp && !pdf_sty_parse_is_punctuation(*bp)) {
         bp++;
         (*data_size) += 1;
+        if (*bp == '&' && (strstr(bp, "&#160") == bp || strstr(bp, "&nbsp") == bp)) {
+            while (bp != buf_end && *bp != ';' && *bp != '<') {
+                bp++;
+            }
+        }
     }
 
     if (pdf_sty_parse_is_punctuation(*bp)) {
@@ -164,20 +169,30 @@ char *pdf_sty_case_folding(char *data, const size_t data_size) {
 static void pdf_sty_rm_hyphenation(char *buf, size_t *data_size) {
     char temp_buf[0xFFFF], *bp, *bp_end;
     size_t temp_buf_size;
+    char *token;
+    size_t token_off;
 
     if (buf == NULL || data_size == NULL || *data_size == 0 || *data_size > sizeof(temp_buf)) {
         return;
     }
 
-    if (strstr(buf, "-<br>") != NULL) {
+    if ((token = strstr(buf, "-<br>")) != NULL || strstr(buf, "-<br/>") != NULL) {
+        if (token == NULL) {
+            token = "-<br/>";
+            token_off = 5;
+        } else {
+            token = "-<br>";
+            token_off = 4;
+        }
+
         memset(temp_buf, 0, sizeof(temp_buf));
         temp_buf_size = 0;
         bp = buf;
         bp_end = bp + *data_size;
 
         while (bp < bp_end) {
-            if (strstr(bp, "-<br>") == bp) {
-                bp += 4;
+            if (strstr(bp, token) == bp) {
+                bp += token_off;
             } else {
                 temp_buf[temp_buf_size++] = *bp;
             }
